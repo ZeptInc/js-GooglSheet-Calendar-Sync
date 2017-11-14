@@ -1,0 +1,50 @@
+/*
+var calId = "zept.ca_5h55iuorjqdujn0vcp458b9f4g@group.calendar.google.com";
+var sheetName = 'Events';
+*/
+
+function addToCal() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet(),
+  var sheet = ss.getActiveSheet(),
+  var data = sheet.getDataRange().getValues(),
+  var calendar = CalendarApp.getCalendarById('zept.ca_5h55iuorjqdujn0vcp458b9f4g@group.calendar.google.com');
+
+  for (var i = 1, ok = 1, len = data.length; i < len; i++)
+  {
+    var title = (data[i][1] + ': '+ data[i][2]),
+        startDate = data[i][4],
+        endDate = data[i][5],
+        eventID = data[i][8],
+        longDescription = ('Description: ' + data[i][2] + ' by ' + data[i][0] + '\nMore info: ' + data[i][7]),
+        location = data[i][6],
+        dateEvents = CalendarApp.getEventsForDay(startDate); //why does this not work?
+    
+    for (var j = 0, jlen = dateEvents.length; j < jlen; j++)
+    {
+      if (dateEvents[j].getTitle() == eventID)
+      {
+        ok = 0; 
+        break; 
+      }
+    }
+
+    if (ok) //if ok what?
+    {
+    CalendarApp.createAllDayEvent(title, startDate, {description: longDescription, location: location}) 
+                                    //, endDate
+      .removeAllReminders();
+      ok = 1;
+  }
+  }
+}
+
+//add a menu when the spreadsheet is opened
+function onOpen() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet(); 
+  var menuEntries = [];  
+  menuEntries.push({name: "updateEventCalendar", functionName: "addToCal"}); 
+  sheet.addMenu("UpdateCalendar", menuEntries);  
+}
+ 
+
+
